@@ -5,8 +5,10 @@ services:
     image: nginx:latest
     ports:
       - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - app
+      - webapp
 
   db:
     image: postgres:latest
@@ -16,6 +18,8 @@ services:
       POSTGRES_DB: emp
     ports:
       - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # Добавление volume
 
   app:
     image: dpage/pgadmin4
@@ -26,3 +30,19 @@ services:
       - "5050:80"
     depends_on:
       - db
+
+  webapp:
+    build: ./webapp
+    ports:
+      - "5000:5000"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: emp
+      POSTGRES_HOST: db
+    depends_on:
+      - db
+
+volumes:
+  pgdata:  # Определение volume
+
